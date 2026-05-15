@@ -1,6 +1,14 @@
 # Déploiement (Vercel + API hébergée)
 
-Le projet est en **deux parties** : le **frontend Next.js** (Vercel) et l’**API FastAPI** (Render, Railway, Fly.io, etc.). Le front proxifie `/api/context`, `/api/analyze`, `/api/quote`, `/api/project` vers l’API via la variable **`INTERNAL_API_URL`**.
+Le projet est en **deux parties** : le **frontend Next.js** (Vercel) et l’**API FastAPI** (Render, Railway, Fly.io, etc.). Le front proxifie `/api/context`, `/api/analyze`, `/api/quote`, `/api/project` vers l’API via la variable **`INTERNAL_API_URL`**, sauf sur Vercel **Services** où l’URL par défaut pointe vers `/_/backend` (voir `vercel.json` à la racine du monorepo).
+
+## 1bis. Vercel Services (expérimental) — front + back sur le même projet
+
+Le fichier **`vercel.json`** définit `experimentalServices` : Next sous `/`, FastAPI sous **`/_/backend`**.
+
+1. Projet Vercel : **Root Directory** = **racine du dépôt** (là où se trouvent `vercel.json`, `frontend/` et `backend/`), **pas** seulement `frontend/`.
+2. **`INTERNAL_API_URL`** : tu peux la **laisser vide** sur Vercel : `frontend/next.config.mjs` utilise alors `https://${VERCEL_URL}/_/backend` pour les rewrites.
+3. Pour forcer une API externe (Render, etc.), définis quand même **`INTERNAL_API_URL`** comme avant.
 
 ## 1. API Python (à faire en premier)
 
@@ -28,12 +36,12 @@ Expose le conteneur derrière HTTPS (obligatoire pour la prod).
 ## 2. Frontend sur Vercel
 
 1. [vercel.com](https://vercel.com) → **Add New** → **Project** → importe le **même dépôt**.
-2. **Root Directory** : `renov-chantier-mvp/frontend` (adapte si ton dépôt n’a pas ce sous-dossier).
+2. **Root Directory** : **racine du repo** (recommandé si tu utilises `vercel.json` + Services) ; sinon **`renov-chantier-mvp/frontend`** uniquement si tu déploies **sans** le backend Vercel (API sur Render, etc.).
 3. **Environment Variables** (Production **et** Preview si tu veux des previews fonctionnelles) :
 
 | Nom | Exemple | Obligatoire |
 |-----|---------|-------------|
-| **`INTERNAL_API_URL`** | `https://artivision-api.onrender.com` | Oui pour `/app` (analyse & devis) |
+| **`INTERNAL_API_URL`** | `https://artivision-api.onrender.com` | Oui **sauf** déploiement Vercel Services avec `vercel.json` (voir §1bis) |
 | **`REPLICATE_API_TOKEN`** | token Replicate | Oui pour la génération d’images |
 | **`NEXT_PUBLIC_SUPABASE_URL`** | URL projet Supabase | Si auth SaaS |
 | **`NEXT_PUBLIC_SUPABASE_ANON_KEY`** | clé anon | Si auth SaaS |
@@ -42,7 +50,7 @@ Expose le conteneur derrière HTTPS (obligatoire pour la prod).
 `NEXT_PUBLIC_API_URL` : laisse **vide** pour que le navigateur appelle `/api/...` sur le même domaine Vercel (recommandé).
 
 4. **Deploy**.  
-   **Important** : `INTERNAL_API_URL` est lue au **build** dans `next.config.mjs`. Elle doit être définie dans Vercel **avant** le build (variables d’environnement du projet). Après un changement d’URL d’API, relance un **Redeploy**.
+   **Important** : en l’absence de **`INTERNAL_API_URL`**, le build utilise **`VERCEL_URL`** (injecté par Vercel) pour cibler `/_/backend`. Si tu définis **`INTERNAL_API_URL`**, elle est figée au build : relance un **Redeploy** après changement.
 
 ## 3. Supabase (auth / redirections)
 

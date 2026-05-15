@@ -1,6 +1,16 @@
 /** @type {import('next').NextConfig} */
-const internalApi =
-  process.env.INTERNAL_API_URL?.replace(/\/$/, "") || "http://127.0.0.1:8000";
+function resolveInternalApiUrl() {
+  const explicit = process.env.INTERNAL_API_URL?.trim().replace(/\/$/, "");
+  if (explicit) return explicit;
+  // Vercel : `vercel.json` experimentalServices → backend sous `/_/backend` (même host que le front).
+  const vercelHost = process.env.VERCEL_URL?.trim().replace(/\/$/, "");
+  if (vercelHost) {
+    return `https://${vercelHost}/_/backend`;
+  }
+  return "http://127.0.0.1:8000";
+}
+
+const internalApi = resolveInternalApiUrl();
 
 /**
  * Ne proxifier que les routes FastAPI réelles.
