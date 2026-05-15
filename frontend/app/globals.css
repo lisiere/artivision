@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Secours : masque l’input fichier même si les utilitaires Tailwind ne sont pas générés */
+.visually-hidden-input {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border-width: 0 !important;
+}
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    min-height: 100dvh;
+    background-color: #f4f7fe;
+    background-image:
+      radial-gradient(1200px 600px at 50% -10%, rgba(99, 102, 241, 0.18), transparent 55%),
+      radial-gradient(900px 500px at 110% 20%, rgba(168, 85, 247, 0.14), transparent 50%),
+      radial-gradient(700px 400px at -10% 80%, rgba(59, 130, 246, 0.12), transparent 45%);
+    background-attachment: fixed;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}

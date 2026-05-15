@@ -1,0 +1,11 @@
+{
+  "name": "renov-chantier-mvp",
+  "private": true,
+  "description": "ArtiVision — `npm run dev` à la racine lance l'API et le front. Vitrine sur /, démo sur /app. Déploiement : docs/DEPLOY.md.",
+  "scripts": {
+    "dev": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/dev.ps1"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}

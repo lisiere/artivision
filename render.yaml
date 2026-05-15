@@ -1,0 +1,19 @@
+# Blueprint Render : https://render.com/docs/blueprint-spec
+# Après import du dépôt : ajuster le nom du service et renseigner GEMINI_API_KEY dans le tableau de bord.
+
+services:
+  - type: web
+    name: artivision-api
+    runtime: docker
+    plan: free
+    region: frankfurt
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    healthCheckPath: /health
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_VISION_MODEL
+        value: gemini-2.5-flash
+      - key: CORS_ALLOW_VERCEL
+        value: "true"

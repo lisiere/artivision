@@ -1,0 +1,114 @@
+{
+  "devise": "EUR",
+  "unite": "m²",
+  "pays": "France",
+  "date_reference": "2026-05",
+  "notes_generales": "Prix moyens TTC incluant main-d'œuvre et matériaux de base (peinture, revêtement de sol, plomberie basique le cas échéant). Hors gros œuvre structurel et hors mobilier non intégré.",
+  "pieces": {
+    "salle_de_bain": {
+      "description": "Rénovation complète incluant plomberie basique, faïence, sol, sanitaires, peinture et électricité aux normes",
+      "entree_de_gamme": {
+        "prix_min": 900,
+        "prix_max": 1200,
+        "prix_moyen": 1050,
+        "details": {
+          "main_oeuvre": 450,
+          "materiaux": 600
+        },
+        "prestations": "Sanitaires standards, carrelage premier prix, peinture acrylique, robinetterie d'entrée de gamme"
+      },
+      "milieu_de_gamme": {
+        "prix_min": 1200,
+        "prix_max": 1800,
+        "prix_moyen": 1500,
+        "details": {
+          "main_oeuvre": 650,
+          "materiaux": 850
+        },
+        "prestations": "Douche à l'italienne, faïence de qualité, meuble vasque, robinetterie mitigeur thermostatique"
+      },
+      "haut_de_gamme": {
+        "prix_min": 1800,
+        "prix_max": 3500,
+        "prix_moyen": 2500,
+        "details": {
+          "main_oeuvre": 1000,
+          "materiaux": 1500
+        },
+        "prestations": "Matériaux nobles (pierre, marbre), douche italienne sur-mesure, baignoire îlot, domotique, chauffage au sol"
+      }
+    },
+    "cuisine": {
+      "description": "Rénovation complète incluant plomberie, électricité, revêtements de sol et muraux, peinture (hors mobilier de cuisine équipée)",
+      "entree_de_gamme": {
+        "prix_min": 700,
+        "prix_max": 1000,
+        "prix_moyen": 850,
+        "details": {
+          "main_oeuvre": 400,
+          "materiaux": 450
+        },
+        "prestations": "Carrelage standard, crédence basique, peinture lessivable, mise aux normes électriques simples"
+      },
+      "milieu_de_gamme": {
+        "prix_min": 1000,
+        "prix_max": 1500,
+        "prix_moyen": 1250,
+        "details": {
+          "main_oeuvre": 550,
+          "materiaux": 700
+        },
+        "prestations": "Carrelage grand format ou parquet stratifié, crédence en verre ou inox, peinture qualité supérieure, prises multiples"
+      },
+      "haut_de_gamme": {
+        "prix_min": 1500,
+        "prix_max": 3000,
+        "prix_moyen": 2200,
+        "details": {
+          "main_oeuvre": 900,
+          "materiaux": 1300
+        },
+        "prestations": "Parquet massif ou pierre naturelle, crédence sur-mesure, éclairage LED intégré, hotte centrale, branchements spécifiques îlot"
+      }
+    },
+    "salon": {
+      "description": "Rénovation complète incluant revêtement de sol, peinture murs et plafond, plinthes, électricité de base",
+      "entree_de_gamme": {
+        "prix_min": 300,
+        "prix_max": 500,
+        "prix_moyen": 400,
+        "details": {
+          "main_oeuvre": 180,
+          "materiaux": 220
+        },
+        "prestations": "Sol stratifié premier prix, peinture acrylique mate, plinthes MDF, prises standards"
+      },
+      "milieu_de_gamme": {
+        "prix_min": 500,
+        "prix_max": 800,
+        "prix_moyen": 650,
+        "details": {
+          "main_oeuvre": 280,
+          "materiaux": 370
+        },
+        "prestations": "Parquet stratifié haute densité ou contrecollé, peinture velours, moulures, multiprises et points lumineux supplémentaires"
+      },
+      "haut_de_gamme": {
+        "prix_min": 800,
+        "prix_max": 1500,
+        "prix_moyen": 1100,
+        "details": {
+          "main_oeuvre": 450,
+          "materiaux": 650
+        },
+        "prestations": "Parquet massif chêne, peinture haut de gamme (Farrow & Ball, Ressource), corniches plâtre, éclairage scénographique, domotique"
+      }
+    }
+  },
+  "facteurs_variation": {
+    "localisation": "Majoration possible de +15% à +30% en Île-de-France et grandes métropoles (Paris, Lyon, Bordeaux)",
+    "etat_initial": "Une remise à nu complète (dépose) peut ajouter 80 à 150 €/m²",
+    "accessibilite": "Étages sans ascenseur ou accès difficile : +5% à +10%",
+    "tva": "TVA à 10% pour logements de plus de 2 ans, 5,5% pour travaux de rénovation énergétique éligibles"
+  }
+}
