@@ -1,14 +1,17 @@
 # Déploiement (Vercel + API hébergée)
 
-Le projet est en **deux parties** : le **frontend Next.js** (Vercel) et l’**API FastAPI** (Render, Railway, Fly.io, etc.). Le front proxifie `/api/context`, `/api/analyze`, `/api/quote`, `/api/project` vers l’API via la variable **`INTERNAL_API_URL`**, sauf sur Vercel **Services** où l’URL par défaut pointe vers `/_/backend` (voir `vercel.json` à la racine du monorepo).
+Le projet est en **deux parties** : le **frontend Next.js** (Vercel) et l’**API FastAPI** (Render, Railway, Fly.io, etc.). Le front expose `/api/context`, `/api/analyze`, `/api/quote`, `/api/project` via des **Route Handlers** Next qui proxy vers FastAPI (URL **`INTERNAL_API_URL`**, ou par défaut **`https://${VERCEL_URL}/_/backend`** sur Vercel Services — voir `vercel.json` et `lib/internalBackend.ts`).
 
 ## 1bis. Vercel Services (expérimental) — front + back sur le même projet
 
 Le fichier **`vercel.json`** définit `experimentalServices` : Next sous `/`, FastAPI sous **`/_/backend`**.
 
 1. Projet Vercel : **Root Directory** = **racine du dépôt** (là où se trouvent `vercel.json`, `frontend/` et `backend/`), **pas** seulement `frontend/`.
-2. **`INTERNAL_API_URL`** : tu peux la **laisser vide** sur Vercel : `frontend/next.config.mjs` utilise alors `https://${VERCEL_URL}/_/backend` pour les rewrites.
+2. **`INTERNAL_API_URL`** : tu peux la **laisser vide** sur Vercel : les Route Handlers utilisent alors `https://${VERCEL_URL}/_/backend`.
 3. Pour forcer une API externe (Render, etc.), définis quand même **`INTERNAL_API_URL`** comme avant.
+4. **« Authentication Required » sur `/_/backend`** : active **Protection Bypass for Automation** (Vercel → projet → **Deployment Protection**). Vercel injecte alors **`VERCEL_AUTOMATION_BYPASS_SECRET`** sur chaque déploiement ; les Route Handlers l’envoient en **`x-vercel-protection-bypass`** vers le backend. **Redeploy** après activation.
+
+   **Sinon** : désactiver la protection sur les **Preview**, ou **`INTERNAL_API_URL`** (Preview) vers une API **hors Vercel** (ex. Render).
 
 ## 1. API Python (à faire en premier)
 
@@ -45,12 +48,10 @@ Expose le conteneur derrière HTTPS (obligatoire pour la prod).
 | **`REPLICATE_API_TOKEN`** | token Replicate | Oui pour la génération d’images |
 | **`NEXT_PUBLIC_SUPABASE_URL`** | URL projet Supabase | Si auth SaaS |
 | **`NEXT_PUBLIC_SUPABASE_ANON_KEY`** | clé anon | Si auth SaaS |
-| **`SUPABASE_SERVICE_ROLE_KEY`** | clé service (serveur uniquement) | Si routes serveur Supabase |
-
-`NEXT_PUBLIC_API_URL` : laisse **vide** pour que le navigateur appelle `/api/...` sur le même domaine Vercel (recommandé).
+| **`VERCEL_AUTOMATION_BYPASS_SECRET`** | (injecté par Vercel si « Protection Bypass for Automation » est activé) | Recommandé avec previews protégées + backend `/_/backend` |
 
 4. **Deploy**.  
-   **Important** : en l’absence de **`INTERNAL_API_URL`**, le build utilise **`VERCEL_URL`** (injecté par Vercel) pour cibler `/_/backend`. Si tu définis **`INTERNAL_API_URL`**, elle est figée au build : relance un **Redeploy** après changement.
+   **Important** : les Route Handlers lisent **`INTERNAL_API_URL`**, **`VERCEL_URL`** et **`VERCEL_AUTOMATION_BYPASS_SECRET`** à l’**exécution**. Après modification des variables Vercel, un **Redeploy** applique les nouvelles valeurs sur les fonctions serverless.
 
 ## 3. Supabase (auth / redirections)
 

@@ -1,26 +1,10 @@
 /** @type {import('next').NextConfig} */
-function resolveInternalApiUrl() {
-  const explicit = process.env.INTERNAL_API_URL?.trim().replace(/\/$/, "");
-  if (explicit) return explicit;
-  // Vercel : `vercel.json` experimentalServices → backend sous `/_/backend` (même host que le front).
-  const vercelHost = process.env.VERCEL_URL?.trim().replace(/\/$/, "");
-  if (vercelHost) {
-    return `https://${vercelHost}/_/backend`;
-  }
-  return "http://127.0.0.1:8000";
-}
-
-const internalApi = resolveInternalApiUrl();
-
 /**
- * Ne proxifier que les routes FastAPI réelles.
- * Sinon `/api/generate` (Route Handler Next → Replicate) part sur le backend → 502.
+ * Les routes FastAPI (`/api/context`, `/api/analyze`, `/api/quote`, `/api/project`) sont
+ * proxifiées par des **Route Handlers** (`app/api/.../route.ts`) pour pouvoir envoyer
+ * l’en-tête `x-vercel-protection-bypass` (voir `lib/internalBackend.ts`).
+ * `/api/generate` reste un Route Handler dédié (Replicate).
  */
-const backendApiRewrites = ["context", "analyze", "quote", "project"].map((path) => ({
-  source: `/api/${path}`,
-  destination: `${internalApi}/api/${path}`,
-}));
-
 const nextConfig = {
   reactStrictMode: true,
   images: {
@@ -31,9 +15,6 @@ const nextConfig = {
         pathname: "/**",
       },
     ],
-  },
-  async rewrites() {
-    return backendApiRewrites;
   },
 };
 
