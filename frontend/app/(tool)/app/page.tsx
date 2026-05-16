@@ -1,5 +1,6 @@
-import { ArtiVisionHome } from "@/components/artivision/ArtiVisionHome";
+import { redirect } from "next/navigation";
 
-export default function AppPage() {
-  return <ArtiVisionHome />;
+/** Ancienne URL — redirection vers /artivision */
+export default function AppLegacyRedirect() {
+  redirect("/artivision");
 }

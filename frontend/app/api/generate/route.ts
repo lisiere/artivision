@@ -75,8 +75,6 @@ const PROMPT_TEMPLATES: Record<Tier, Record<RoomType, string>> = {
 const NEGATIVE_PROMPT =
   "different room layout, different room shape, distorted walls, warped perspective, additional rooms, removed walls, different window positions, blurry, low quality, deformed geometry, surreal, fantasy, cartoon, painting, drawing, oversaturated, watermark, text, logo";
 
-type GenerationProfile = "faithful" | "inspired";
-
 type AnalysisPayload = {
   suggested_room_type?: string;
   materials?: string[];
@@ -88,9 +86,6 @@ type AnalysisPayload = {
 const FAITHFUL_ANCHOR_EN =
   "Strictly preserve the visible source frame: same walls, same floor area shown, same openings only where already visible, same visible fixtures and plumbing positions. Do not add toilets, bathtubs, furniture, appliances, doors or windows that are not clearly visible in the source image. Photorealistic finishes on existing visible surfaces only.";
 
-const INSPIRED_ANCHOR_EN =
-  "Keep the same room type and a believable footprint; stay consistent with the photo; allow tasteful new elements only when they plausibly fit the visible layout without inventing a different room.";
-
 function clampText(s: string, max: number): string {
   const t = s.trim();
   if (t.length <= max) return t;
@@ -100,15 +95,10 @@ function clampText(s: string, max: number): string {
 function buildAugmentedPrompt(
   basePrompt: string,
   negativeBase: string,
-  profile: GenerationProfile,
   analysis?: AnalysisPayload | null,
 ): { prompt: string; negative_prompt: string; prompt_strength: number; guidance_scale: number } {
-  const prof: GenerationProfile = profile === "inspired" ? "inspired" : "faithful";
   const anchorGem = typeof analysis?.prompt_anchor_en === "string" ? analysis.prompt_anchor_en.trim() : "";
-  const anchor =
-    prof === "faithful"
-      ? [FAITHFUL_ANCHOR_EN, anchorGem].filter(Boolean).join(" ")
-      : [INSPIRED_ANCHOR_EN, anchorGem].filter(Boolean).join(" ");
+  const anchor = [FAITHFUL_ANCHOR_EN, anchorGem].filter(Boolean).join(" ");
 
   const notesFr = typeof analysis?.short_notes_fr === "string" ? analysis.short_notes_fr.trim() : "";
   const notesBlock = notesFr ? ` Site context (French): ${clampText(notesFr, 500)}` : "";
@@ -126,18 +116,14 @@ function buildAugmentedPrompt(
 
   const extraNeg = typeof analysis?.negative_extra_en === "string" ? analysis.negative_extra_en.trim() : "";
   const profileNeg =
-    prof === "faithful"
-      ? "hallucinated toilet, hallucinated WC, extra bathroom door, new window opening, invented vanity, invented kitchen island, second room, duplicate room, impossible architecture"
-      : "completely different room type, outdoor landscape instead of interior, blueprint overlay";
+    "hallucinated toilet, hallucinated WC, extra bathroom door, new window opening, invented vanity, invented kitchen island, second room, duplicate room, impossible architecture";
 
   const negative_prompt = clampText(
     [negativeBase, extraNeg, profileNeg].filter(Boolean).join(", ").replace(/\s*,\s*,+/g, ",").replace(/\s+/g, " "),
     2000,
   );
 
-  const prompt_strength = prof === "faithful" ? 0.5 : 0.76;
-  const guidance_scale = prof === "faithful" ? 12 : 15;
-  return { prompt, negative_prompt, prompt_strength, guidance_scale };
+  return { prompt, negative_prompt, prompt_strength: 0.5, guidance_scale: 12 };
 }
 
 function safeJsonStringify(value: unknown): string {
@@ -218,10 +204,9 @@ export async function POST(req: NextRequest) {
       imageUrl?: string;
       roomType?: string;
       tier?: string;
-      profile?: string;
       analysis?: AnalysisPayload;
     };
-    const { imageUrl, roomType, tier, profile: profileRaw, analysis } = body;
+    const { imageUrl, roomType, tier, analysis } = body;
 
     if (!imageUrl || !roomType || !tier) {
       return NextResponse.json(
@@ -238,11 +223,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const profile: GenerationProfile = profileRaw === "inspired" ? "inspired" : "faithful";
     const { prompt, negative_prompt, prompt_strength, guidance_scale } = buildAugmentedPrompt(
       basePrompt,
       NEGATIVE_PROMPT,
-      profile,
       analysis ?? null,
     );
 

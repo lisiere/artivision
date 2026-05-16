@@ -1,3 +1,4 @@
+import { SiteHeader } from "@/components/artivision/SiteHeader";
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 
@@ -8,5 +9,10 @@ export const metadata: Metadata = {
 };
 
 export default function MarketingLayout({ children }: { children: ReactNode }) {
-  return children;
+  return (
+    <>
+      <SiteHeader />
+      {children}
+    </>
+  );
 }

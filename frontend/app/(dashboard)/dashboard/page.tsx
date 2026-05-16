@@ -23,8 +23,8 @@ export default function DashboardHomePage() {
         </li>
         <li>
           →{" "}
-          <Link href="/app" className="underline-offset-2 hover:underline">
-            Ancienne démo chantier /app
+          <Link href="/artivision" className="underline-offset-2 hover:underline">
+            Outil ArtiVision
           </Link>
         </li>
       </ul>

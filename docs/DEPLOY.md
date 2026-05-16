@@ -9,7 +9,8 @@ Le fichier **`vercel.json`** définit `experimentalServices` : Next sous `/`, Fa
 1. Projet Vercel : **Root Directory** = **racine du dépôt** (là où se trouvent `vercel.json`, `frontend/` et `backend/`), **pas** seulement `frontend/`.
 2. **`INTERNAL_API_URL`** : tu peux la **laisser vide** sur Vercel : les Route Handlers utilisent alors `https://${VERCEL_URL}/_/backend`.
 3. Pour forcer une API externe (Render, etc.), définis quand même **`INTERNAL_API_URL`** comme avant.
-4. **« Authentication Required » sur `/_/backend`** : active **Protection Bypass for Automation** (Vercel → projet → **Deployment Protection**). Vercel injecte alors **`VERCEL_AUTOMATION_BYPASS_SECRET`** sur chaque déploiement ; les Route Handlers l’envoient en **`x-vercel-protection-bypass`** vers le backend. **Redeploy** après activation.
+4. **`GEMINI_API_KEY`** : obligatoire sur le projet Vercel (Settings → Environment Variables) pour que le service **backend** analyse les photos. Sans elle, `/app` renvoie l’erreur « GEMINI_API_KEY manquante ».
+5. **« Authentication Required » sur `/_/backend`** : active **Protection Bypass for Automation** (Vercel → projet → **Deployment Protection**). Vercel injecte alors **`VERCEL_AUTOMATION_BYPASS_SECRET`** sur chaque déploiement ; les Route Handlers l’envoient en **`x-vercel-protection-bypass`** vers le backend. **Redeploy** après activation.
 
    **Sinon** : désactiver la protection sur les **Preview**, ou **`INTERNAL_API_URL`** (Preview) vers une API **hors Vercel** (ex. Render).
 
@@ -44,6 +45,7 @@ Expose le conteneur derrière HTTPS (obligatoire pour la prod).
 
 | Nom | Exemple | Obligatoire |
 |-----|---------|-------------|
+| **`GEMINI_API_KEY`** | clé [Google AI Studio](https://aistudio.google.com/apikey) | **Oui** pour le service **backend** (analyse photo `/api/analyze`) |
 | **`INTERNAL_API_URL`** | `https://artivision-api.onrender.com` | Oui **sauf** déploiement Vercel Services avec `vercel.json` (voir §1bis) |
 | **`REPLICATE_API_TOKEN`** | token Replicate | Oui pour la génération d’images |
 | **`NEXT_PUBLIC_SUPABASE_URL`** | URL projet Supabase | Si auth SaaS |

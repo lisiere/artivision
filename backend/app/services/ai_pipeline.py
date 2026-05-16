@@ -56,7 +56,10 @@ def _safe_parse_json_object(text: str) -> dict[str, Any] | None:
 def _require_gemini() -> None:
     if not get_settings().gemini_api_key.strip():
         raise RuntimeError(
-            "GEMINI_API_KEY manquante dans backend/.env — requise pour l'analyse photo (Gemini)."
+            "GEMINI_API_KEY manquante — requise pour l'analyse photo (Gemini). "
+            "En local : renseignez-la dans backend/.env (voir backend/.env.example). "
+            "Sur Vercel / Render : ajoutez la variable d'environnement GEMINI_API_KEY au projet "
+            "puis redéployez (clé : https://aistudio.google.com/apikey)."
         )
 
 

@@ -25,69 +25,7 @@ const process = [
 export function LandingPage() {
   return (
     <div className="relative min-h-dvh overflow-x-hidden">
-      <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/80 shadow-sm backdrop-blur-xl supports-[backdrop-filter]:bg-white/70">
-        <nav
-          className="mx-auto flex h-[3.25rem] max-w-6xl items-center justify-between gap-3 px-4 sm:h-14 sm:gap-6 sm:px-6 lg:px-8"
-          aria-label="Navigation principale"
-        >
-          <Link
-            href="/"
-            className="group flex min-w-0 shrink items-center gap-2.5 rounded-lg py-1 no-underline outline-none ring-indigo-400/0 transition focus-visible:ring-2 focus-visible:ring-indigo-400/40 focus-visible:ring-offset-2"
-          >
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 via-indigo-500 to-violet-600 text-white shadow-glow sm:h-10 sm:w-10">
-              <Sparkles className="h-4 w-4 text-white sm:h-[18px] sm:w-[18px]" strokeWidth={2.2} aria-hidden />
-            </span>
-            <span className="min-w-0 text-left leading-tight">
-              <span className="block truncate text-base font-extrabold tracking-tight text-slate-900 sm:text-lg">
-                <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 bg-clip-text text-transparent">
-                  ArtiVision
-                </span>
-              </span>
-              <span className="hidden text-[11px] font-medium text-slate-500 sm:block sm:text-xs">
-                Votre chantier en image
-              </span>
-            </span>
-          </Link>
-
-          <div className="hidden flex-1 items-center justify-center gap-0.5 md:flex">
-            <Link
-              href="#methode"
-              className="rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 no-underline transition hover:bg-slate-100/80 hover:text-slate-900"
-            >
-              Méthode
-            </Link>
-            <Link
-              href="/app"
-              className="rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 no-underline transition hover:bg-slate-100/80 hover:text-slate-900"
-            >
-              Démo chantier
-            </Link>
-            <Link
-              href="/login"
-              className="rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 no-underline transition hover:bg-slate-100/80 hover:text-slate-900"
-            >
-              Connexion
-            </Link>
-          </div>
-
-          <div className="flex shrink-0 items-center gap-2 sm:gap-3">
-            <Link
-              href="/app"
-              className="rounded-lg px-2.5 py-2 text-xs font-bold text-indigo-700 no-underline transition hover:bg-indigo-50 hover:text-indigo-900 md:hidden"
-            >
-              Démo
-            </Link>
-            <Link
-              href="/signup"
-              className="inline-flex h-9 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 via-indigo-600 to-violet-700 px-3.5 text-xs font-extrabold text-white no-underline shadow-md shadow-indigo-500/20 transition hover:brightness-110 sm:h-10 sm:px-5 sm:text-sm"
-            >
-              Accès pro
-            </Link>
-          </div>
-        </nav>
-      </header>
-
-      <main className="relative mx-auto max-w-6xl px-4 pb-10 pt-6 sm:px-6 sm:pb-14 sm:pt-8 lg:px-8">
+      <main className="relative mx-auto max-w-6xl px-4 pb-10 pt-4 sm:px-6 sm:pb-14 sm:pt-6 lg:px-8">
         <div
           className={`pointer-events-none absolute -left-20 top-16 h-72 w-72 rounded-full bg-indigo-400/20 blur-3xl motion-safe:animate-blob-drift ${motionSafe}`}
           aria-hidden
@@ -125,22 +63,30 @@ export function LandingPage() {
               Projection et fourchette à partir du terrain — pour vendre sans alourdir le discours.
             </p>
 
-            <div className="mt-6 rounded-2xl border border-indigo-100/90 bg-gradient-to-br from-slate-50/90 via-white to-indigo-50/50 p-4 sm:p-5">
-              <div className="grid grid-cols-3 gap-1 sm:gap-3">
+            <div className="mt-6 rounded-2xl border border-indigo-100/90 bg-gradient-to-br from-slate-50/90 via-white to-indigo-50/50 p-4 sm:p-6">
+              <div className="grid grid-cols-3 divide-x divide-indigo-100/90">
                 {process.map(({ n, Icon, title, line }, i) => (
                   <div
                     key={n}
-                    className={`flex flex-col items-center text-center ${i > 0 ? "border-l border-indigo-100/80 pl-2 sm:pl-4" : ""} motion-safe:animate-reveal ${motionSafe}`}
+                    className={`flex min-h-[7.5rem] flex-col items-center justify-between px-2 py-1 text-center sm:min-h-[8.25rem] sm:px-4 motion-safe:animate-reveal ${motionSafe}`}
                     style={{ animationDelay: `${i * 50}ms` } as CSSProperties}
                   >
-                    <span className="font-mono text-[9px] font-bold text-indigo-400">{n}</span>
-                    <div className="mt-1.5 rounded-full bg-gradient-to-br from-blue-500 via-indigo-500 to-violet-600 p-px shadow-sm">
-                      <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white">
-                        <Icon className="h-4 w-4 text-indigo-600" strokeWidth={1.85} aria-hidden />
+                    <div className="flex w-full flex-col items-center">
+                      <span className="font-mono text-[9px] font-bold tracking-wider text-indigo-400 sm:text-[10px]">
+                        {n}
+                      </span>
+                      <div className="mt-2 rounded-full bg-gradient-to-br from-blue-500 via-indigo-500 to-violet-600 p-px shadow-sm sm:mt-2.5">
+                        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white sm:h-10 sm:w-10">
+                          <Icon className="h-4 w-4 text-indigo-600 sm:h-[18px] sm:w-[18px]" strokeWidth={1.85} aria-hidden />
+                        </div>
                       </div>
                     </div>
-                    <p className="mt-2 text-[11px] font-bold text-slate-900">{title}</p>
-                    <p className="mt-0.5 text-[10px] font-medium leading-tight text-slate-500">{line}</p>
+                    <div className="mt-5 flex w-full flex-col items-center gap-1 sm:mt-6">
+                      <p className="text-[11px] font-bold leading-snug text-slate-900 sm:text-xs">{title}</p>
+                      <p className="max-w-[6.5rem] text-[10px] font-medium leading-snug text-slate-500 sm:max-w-none sm:text-[11px]">
+                        {line}
+                      </p>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -154,10 +100,10 @@ export function LandingPage() {
                 Accès professionnel
               </Link>
               <Link
-                href="/app"
+                href="/artivision"
                 className="inline-flex h-12 flex-1 items-center justify-center rounded-2xl border-2 border-indigo-200 bg-white text-sm font-extrabold text-indigo-800 no-underline shadow-sm transition hover:bg-indigo-50/80 sm:flex-none sm:min-w-[180px]"
               >
-                Démonstration
+                ArtiVision
               </Link>
             </div>
 

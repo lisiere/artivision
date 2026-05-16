@@ -1,13 +1,19 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Sparkles } from "lucide-react";
 
 export function SiteHeader() {
+  const pathname = usePathname();
+  const isLanding = pathname === "/";
+
   return (
     <header className="sticky top-0 z-50 border-b border-white/40 bg-[#f4f7fe]/80 px-3 py-3 shadow-sm backdrop-blur-xl sm:px-5 lg:px-8">
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 rounded-2xl border border-white/70 bg-white/90 px-4 py-3 shadow-card sm:rounded-3xl sm:px-5 sm:py-3.5 lg:px-6">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 rounded-2xl border border-white/70 bg-white/90 px-3 py-2.5 shadow-card sm:gap-4 sm:rounded-3xl sm:px-5 sm:py-3.5 lg:px-6">
         <Link
           href="/"
-          className="group flex min-w-0 items-center gap-2 rounded-xl no-underline outline-none ring-indigo-400/0 transition focus-visible:ring-2 focus-visible:ring-offset-2"
+          className="group flex min-w-0 shrink items-center gap-2 rounded-xl no-underline outline-none ring-indigo-400/0 transition focus-visible:ring-2 focus-visible:ring-offset-2"
         >
           <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 via-indigo-500 to-violet-600 text-lg shadow-glow sm:h-10 sm:w-10">
             <Sparkles className="h-4 w-4 text-white sm:h-[18px] sm:w-[18px]" strokeWidth={2.2} aria-hidden />
@@ -26,9 +32,55 @@ export function SiteHeader() {
             </span>
           </span>
         </Link>
-        <span className="shrink-0 rounded-full bg-gradient-to-r from-indigo-600 to-violet-600 px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-widest text-white shadow-md sm:px-3 sm:text-[11px]">
-          IA v1
-        </span>
+
+        {isLanding ? (
+          <nav
+            className="hidden flex-1 items-center justify-center gap-0.5 md:flex"
+            aria-label="Navigation principale"
+          >
+            <Link
+              href="#methode"
+              className="rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 no-underline transition hover:bg-slate-100/80 hover:text-slate-900"
+            >
+              Méthode
+            </Link>
+            <Link
+              href="/artivision"
+              className="rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 no-underline transition hover:bg-slate-100/80 hover:text-slate-900"
+            >
+              ArtiVision
+            </Link>
+            <Link
+              href="/login"
+              className="rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 no-underline transition hover:bg-slate-100/80 hover:text-slate-900"
+            >
+              Connexion
+            </Link>
+          </nav>
+        ) : null}
+
+        <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+          {isLanding ? (
+            <>
+              <Link
+                href="/artivision"
+                className="rounded-lg px-2.5 py-2 text-xs font-bold text-indigo-700 no-underline transition hover:bg-indigo-50 hover:text-indigo-900 md:hidden"
+              >
+                ArtiVision
+              </Link>
+              <Link
+                href="/signup"
+                className="inline-flex h-9 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 via-indigo-600 to-violet-700 px-3.5 text-xs font-extrabold text-white no-underline shadow-md shadow-indigo-500/20 transition hover:brightness-110 sm:h-10 sm:px-5 sm:text-sm"
+              >
+                Accès pro
+              </Link>
+            </>
+          ) : (
+            <span className="shrink-0 rounded-full bg-gradient-to-r from-indigo-600 to-violet-600 px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-widest text-white shadow-md sm:px-3 sm:text-[11px]">
+              IA v1
+            </span>
+          )}
+        </div>
       </div>
     </header>
   );

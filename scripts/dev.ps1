@@ -42,7 +42,7 @@ $webCmd = "cd /d `"$root\frontend`" && npm run dev"
 
 Write-Host ""
 Write-Host "  Vitrine : http://localhost:3000/" -ForegroundColor Green
-Write-Host "  Outil   : http://localhost:3000/app" -ForegroundColor Green
+Write-Host "  Outil   : http://localhost:3000/artivision" -ForegroundColor Green
 Write-Host "  API     : http://127.0.0.1:8000/docs" -ForegroundColor Green
 Write-Host "  (port 3001 si 3000 pris)" -ForegroundColor DarkGray
 Write-Host "  Ctrl+C arrete les deux services." -ForegroundColor DarkGray

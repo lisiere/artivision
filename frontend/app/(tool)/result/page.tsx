@@ -64,18 +64,18 @@ export default function ResultPage() {
   useEffect(() => {
     const raw = sessionStorage.getItem(STORAGE_KEY);
     if (!raw) {
-      router.replace("/app");
+      router.replace("/artivision");
       return;
     }
     try {
       const parsed = JSON.parse(raw) as SessionData;
       if (!parsed.projectionUrl || (parsed.version !== 1 && parsed.version !== 2)) {
-        router.replace("/app");
+        router.replace("/artivision");
         return;
       }
       setData(parsed);
     } catch {
-      router.replace("/app");
+      router.replace("/artivision");
     }
   }, [router]);
 
@@ -110,7 +110,7 @@ export default function ResultPage() {
 
       <div className="relative mx-auto w-full max-w-7xl px-4 sm:px-5 lg:px-10">
         <Link
-          href="/app"
+          href="/artivision"
           className="mb-6 inline-flex items-center gap-2 rounded-xl border border-white/80 bg-white/90 px-3 py-2 text-sm font-bold text-indigo-700 shadow-sm no-underline transition hover:border-indigo-200 hover:bg-indigo-50/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2"
         >
           <ArrowLeft className="h-4 w-4" strokeWidth={2.2} aria-hidden />
@@ -236,7 +236,7 @@ export default function ResultPage() {
               <div className="relative">
                 <div className="pointer-events-none absolute -inset-0.5 rounded-3xl bg-gradient-to-r from-indigo-500 to-violet-600 opacity-25 blur-md" />
                 <Link
-                  href="/app"
+                  href="/artivision"
                   className="relative flex min-h-[48px] w-full items-center justify-center rounded-2xl border-2 border-indigo-100 bg-white py-3 text-center text-sm font-extrabold text-indigo-700 shadow-sm no-underline transition hover:border-indigo-200 hover:bg-indigo-50/90 sm:rounded-3xl"
                 >
                   Nouvelle estimation

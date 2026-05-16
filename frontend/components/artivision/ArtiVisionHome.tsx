@@ -84,8 +84,6 @@ function replicateKeyFromQuoteTier(q: QualityTierId): ReplicateTierKey {
   return "standard";
 }
 
-type GenerationProfileId = "faithful" | "inspired";
-
 type GenerateAnalysisPayload = {
   suggested_room_type: string;
   materials: string[];
@@ -111,7 +109,7 @@ type ResultModalData = {
   imageDataUrl: string;
   replicateRoomType: string;
   roomTypeResolved: RoomValue;
-  generateContext: { profile: GenerationProfileId; analysis: GenerateAnalysisPayload };
+  generateContext: { analysis: GenerateAnalysisPayload };
 };
 type RoomSlot = {
   id: string;
@@ -120,8 +118,6 @@ type RoomSlot = {
   qualityTier: QualityTierId;
   /** Gamme choisie pour chiffrer + générer (obligatoire avant le bouton). */
   projectionTier: ReplicateTierKey | null;
-  /** Fidèle = respect photo ; Inspiré = ambiance plus libre (même tarifs). */
-  generationProfile: GenerationProfileId;
   photos: PhotoEntry[];
   materials: string[];
   /** True après une analyse réussie pour le jeu de photos actuel (les matériaux peuvent être vides). */
@@ -142,7 +138,6 @@ function makeRoom(): RoomSlot {
     areaM2: 25,
     qualityTier: "standard",
     projectionTier: null,
-    generationProfile: "faithful",
     photos: [],
     materials: [],
     analysisCompleted: false,
@@ -336,7 +331,6 @@ export function ArtiVisionHome() {
           | "areaM2"
           | "qualityTier"
           | "projectionTier"
-          | "generationProfile"
           | "materials"
           | "analysisCompleted"
         >
@@ -458,7 +452,6 @@ export function ArtiVisionHome() {
 
       const imageDataUrl = await resizeImageToJpegDataUrl(files[0]);
       const repRoom = replicateRoomTypeFromRoomValue(roomType);
-      const genProfile = activeRoom.generationProfile;
       const analysisPayload: GenerateAnalysisPayload = {
         suggested_room_type: roomType,
         materials: mats,
@@ -479,7 +472,6 @@ export function ArtiVisionHome() {
             imageUrl: imageDataUrl,
             roomType: repRoom,
             tier: tierKey,
-            profile: genProfile,
             analysis: analysisPayload,
           }),
         });
@@ -547,7 +539,7 @@ export function ArtiVisionHome() {
         imageDataUrl,
         replicateRoomType: repRoom,
         roomTypeResolved: roomType,
-        generateContext: { profile: genProfile, analysis: analysisPayload },
+        generateContext: { analysis: analysisPayload },
       });
     } catch (err) {
       if (err instanceof DOMException && err.name === "TimeoutError") {
@@ -561,7 +553,6 @@ export function ArtiVisionHome() {
     }
   }, [
     activeRoom.areaM2,
-    activeRoom.generationProfile,
     activeRoom.photos,
     activeRoom.projectionTier,
     activeRoom.roomType,
@@ -602,7 +593,6 @@ export function ArtiVisionHome() {
           imageUrl: m.imageDataUrl,
           roomType: m.replicateRoomType,
           tier: m.tier,
-          profile: m.generateContext.profile,
           analysis: m.generateContext.analysis,
         }),
       });
@@ -651,7 +641,7 @@ export function ArtiVisionHome() {
   }, [resultModal]);
 
   return (
-    <main className="relative pb-36 pt-6 sm:pb-40 sm:pt-8 lg:pb-44 lg:pt-10">
+    <main className="relative pb-36 pt-2 sm:pb-40 sm:pt-4 lg:pb-44 lg:pt-6">
       <div
         className="pointer-events-none absolute left-0 top-24 h-72 w-72 -translate-x-1/4 rounded-full bg-indigo-400/15 blur-3xl lg:left-[12%] lg:h-96 lg:w-96"
         aria-hidden
@@ -662,21 +652,6 @@ export function ArtiVisionHome() {
       />
 
       <div className="relative mx-auto w-full max-w-7xl px-4 sm:px-5 lg:px-10">
-        <header className="relative mb-8 lg:mb-10">
-          <div className="mx-auto max-w-3xl text-center lg:mx-0 lg:text-left">
-            <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-indigo-500">ArtiVision</p>
-            <h1 className="mt-2 text-balance text-3xl font-black tracking-tight text-slate-900 sm:text-4xl lg:text-5xl lg:leading-[1.1]">
-              <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 bg-clip-text text-transparent">
-                Le client se projette
-              </span>
-              <span className="text-slate-800">, vous chiffrez</span>
-            </h1>
-            <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-slate-600 lg:mx-0 lg:text-base">
-              Photo, vision, prix — le client se projette tout de suite.
-            </p>
-          </div>
-        </header>
-
       <input
         ref={fileInputRef}
         className="sr-only"
@@ -962,7 +937,7 @@ export function ArtiVisionHome() {
           <h2 className="text-xs font-bold uppercase tracking-[0.2em] text-indigo-600">Gamme pour la vision</h2>
         </div>
         <p className="mb-3 text-[11px] font-medium leading-snug text-slate-500">
-          Sélectionnez une ambiance — une seule projection sera générée (évite les limites API).
+          Pilote le chiffrage et le rendu visuel — une projection par lancement.
         </p>
         <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-3 lg:grid-cols-1 lg:gap-3">
           {tiers.map((t) => {
@@ -988,50 +963,17 @@ export function ArtiVisionHome() {
           })}
         </div>
       </section>
-
-      {/* Fidèle / Inspiré — mêmes tarifs */}
-      <section className="relative mb-5 rounded-3xl border border-slate-200/90 bg-white p-5 shadow-card sm:p-6 lg:rounded-2xl lg:border-0 lg:bg-transparent lg:p-0 lg:shadow-none">
-        <div className="mb-3 flex items-center gap-2">
-          <Focus className="h-5 w-5 text-indigo-600" strokeWidth={2} aria-hidden />
-          <h2 className="text-xs font-bold uppercase tracking-[0.2em] text-indigo-600">Rendu visuel</h2>
-        </div>
-        <p className="mb-3 text-[11px] font-medium leading-snug text-slate-500">
-          Fidèle : respecter au maximum la photo (murs, ouvertures). Inspiré : ambiance plus libre, toujours plausible pour
-          le type de pièce — tarification inchangée.
-        </p>
-        <div className="grid grid-cols-2 gap-2.5">
-          <button
-            type="button"
-            onClick={() => patchActiveRoom({ generationProfile: "faithful" })}
-            className={[
-              "flex flex-col items-start gap-1 rounded-2xl border-2 px-3 py-3 text-left text-sm transition",
-              activeRoom.generationProfile === "faithful"
-                ? "border-indigo-500 bg-indigo-50/90 shadow-sm ring-2 ring-indigo-200/90"
-                : "border-slate-100 bg-slate-50/70 hover:border-indigo-200",
-            ].join(" ")}
-          >
-            <span className="flex items-center gap-1.5 font-extrabold text-slate-900">
-              <Focus className="h-4 w-4 shrink-0 text-indigo-600" strokeWidth={2.2} aria-hidden />
-              Fidèle
-            </span>
-            <span className="text-[11px] leading-snug text-slate-600">Structure et cadrage proches de vos clichés.</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => patchActiveRoom({ generationProfile: "inspired" })}
-            className={[
-              "flex flex-col items-start gap-1 rounded-2xl border-2 px-3 py-3 text-left text-sm transition",
-              activeRoom.generationProfile === "inspired"
-                ? "border-indigo-500 bg-indigo-50/90 shadow-sm ring-2 ring-indigo-200/90"
-                : "border-slate-100 bg-slate-50/70 hover:border-indigo-200",
-            ].join(" ")}
-          >
-            <span className="flex items-center gap-1.5 font-extrabold text-slate-900">
-              <Sparkles className="h-4 w-4 shrink-0 text-violet-600" strokeWidth={2.2} aria-hidden />
-              Inspiré
-            </span>
-            <span className="text-[11px] leading-snug text-slate-600">Plus créatif, sans inventer une autre pièce.</span>
-          </button>
+      <section className="relative mb-5 rounded-2xl border border-indigo-100/80 bg-indigo-50/40 px-4 py-3.5">
+        <div className="flex gap-3">
+          <Focus className="mt-0.5 h-4 w-4 shrink-0 text-indigo-600" strokeWidth={2} aria-hidden />
+          <div>
+            <p className="text-xs font-bold text-indigo-900">Projection chantier</p>
+            <p className="mt-1 text-[11px] font-medium leading-relaxed text-slate-600">
+              Le rendu respecte vos photos (cadrage, ouvertures visibles) et la{" "}
+              <span className="font-semibold text-slate-800">gamme choisie</span> pour l’ambiance et les finitions — un
+              avant/après crédible à montrer au client.
+            </p>
+          </div>
         </div>
       </section>
 
@@ -1148,8 +1090,7 @@ export function ArtiVisionHome() {
                 Voici l’après-travaux — {tierHeadingLabel(tiers, resultModal.tier)}
               </h2>
               <p className="mt-2 text-center text-sm font-medium text-slate-600">
-                {resultModal.qualityLabel} · {resultModal.areaM2} m² ·{" "}
-                {resultModal.generateContext.profile === "faithful" ? "Rendu fidèle" : "Rendu inspiré"}
+                {resultModal.qualityLabel} · {resultModal.areaM2} m² · projection indicative
               </p>
               <p className="mx-auto mt-2 max-w-lg text-center text-[11px] font-medium leading-relaxed text-slate-500">
                 Image indicative : le rendu peut varier selon la photo et le modèle ; pas de valeur contractuelle.

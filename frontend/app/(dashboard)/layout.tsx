@@ -30,10 +30,10 @@ export default function DashboardRootLayout({ children }: { children: ReactNode 
         </nav>
         <div className="mt-4 border-t border-slate-100 pt-4">
           <Link
-            href="/app"
+            href="/artivision"
             className="mb-3 block rounded-xl px-3 py-2 text-xs font-semibold text-slate-500 no-underline hover:bg-slate-50 hover:text-slate-800"
           >
-            Outil chantier (démo)
+            ArtiVision
           </Link>
           <DashboardSignOut />
         </div>
