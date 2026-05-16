@@ -12,7 +12,7 @@ const NAV = [
 
 export default function DashboardRootLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="flex min-h-dvh bg-[#f4f7fe]">
+    <div className="flex min-h-dvh bg-soft">
       <aside className="hidden w-60 shrink-0 flex-col border-r border-slate-200/80 bg-white/95 p-4 lg:flex">
         <Link href="/dashboard" className="mb-8 block px-2 text-lg font-black text-slate-900 no-underline">
           ArtiVision <span className="text-indigo-600">Pro</span>

@@ -1,18 +1,12 @@
-import { SiteHeader } from "@/components/artivision/SiteHeader";
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 
 export const metadata: Metadata = {
-  title: "ArtiVision — Photo, projection, devis sur le chantier",
+  title: "ArtiVision — Votre chantier en image",
   description:
-    "Outil B2B pour artisans : une photo, une projection rénovée et une fourchette de devis en secondes. Conçu pour signer sur place.",
+    "Projection visuelle et chiffrage pour artisans de la rénovation. Photographiez, projetez, chiffrez en quelques secondes.",
 };
 
 export default function MarketingLayout({ children }: { children: ReactNode }) {
-  return (
-    <>
-      <SiteHeader />
-      {children}
-    </>
-  );
+  return children;
 }

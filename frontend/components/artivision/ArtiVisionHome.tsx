@@ -641,7 +641,7 @@ export function ArtiVisionHome() {
   }, [resultModal]);
 
   return (
-    <main className="relative pb-36 pt-2 sm:pb-40 sm:pt-4 lg:pb-44 lg:pt-6">
+    <main className="relative pb-36 pt-2 text-text sm:pb-40 sm:pt-4 lg:pb-44 lg:pt-6">
       <div
         className="pointer-events-none absolute left-0 top-24 h-72 w-72 -translate-x-1/4 rounded-full bg-indigo-400/15 blur-3xl lg:left-[12%] lg:h-96 lg:w-96"
         aria-hidden

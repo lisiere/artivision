@@ -51,74 +51,80 @@ export default function SignupPage() {
   );
 
   return (
-    <div className="rounded-3xl border border-white/80 bg-white/95 p-8 shadow-xl shadow-indigo-200/40">
-      <div className="mb-8 text-center">
-        <Link href="/" className="inline-flex items-center gap-2 font-black text-slate-900 no-underline">
-          <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-violet-600 text-white shadow-md">
-            <Sparkles className="h-5 w-5" aria-hidden />
-          </span>
-          ArtiVision
-        </Link>
-        <h1 className="mt-6 text-2xl font-black text-slate-900">Créer mon espace</h1>
-        <p className="mt-2 text-sm font-medium text-slate-600">SaaS artisans — sprint onboarding après inscription.</p>
+    <div className="container max-w-md py-12">
+      <div className="rounded-xl border border-border bg-bg-elev p-8 shadow-lg sm:p-10">
+        <div className="mb-8 text-center">
+          <Link href="/" className="inline-flex items-center gap-2 font-display font-bold text-text no-underline">
+            <span className="flex h-10 w-10 items-center justify-center rounded-md grad-brand text-white shadow-glow">
+              <Sparkles className="h-5 w-5" aria-hidden />
+            </span>
+            ArtiVision
+          </Link>
+          <h1 className="mt-6 font-display text-3xl font-bold">Créer votre compte</h1>
+          <p className="mt-2 text-sm text-text-soft">Espace pro — onboarding après inscription</p>
+        </div>
+
+        <form onSubmit={onSubmit} className="space-y-4">
+          <div>
+            <label htmlFor="email" className="mb-2 block text-sm font-medium">
+              Email pro
+            </label>
+            <input
+              id="email"
+              type="email"
+              autoComplete="email"
+              required
+              value={email}
+              onChange={(ev) => setEmail(ev.target.value)}
+              placeholder="vous@entreprise.fr"
+              className="h-11 w-full rounded border border-border bg-surface px-4 text-sm outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20"
+            />
+          </div>
+          <div>
+            <label htmlFor="password" className="mb-2 block text-sm font-medium">
+              Mot de passe
+            </label>
+            <input
+              id="password"
+              type="password"
+              autoComplete="new-password"
+              required
+              minLength={8}
+              value={password}
+              onChange={(ev) => setPassword(ev.target.value)}
+              className="h-11 w-full rounded border border-border bg-surface px-4 text-sm outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20"
+            />
+            <p className="mt-1 text-xs text-text-dim">Au moins 8 caractères.</p>
+          </div>
+          {error ? (
+            <p
+              className="rounded-lg bg-red-500/10 px-3 py-2 text-sm font-medium text-red-600 dark:text-red-400"
+              role="alert"
+            >
+              {error}
+            </p>
+          ) : null}
+          {info ? (
+            <p className="rounded-lg bg-brand-50 px-3 py-2 text-sm font-medium text-brand-700 dark:bg-brand-900/30 dark:text-brand-300" role="status">
+              {info}
+            </p>
+          ) : null}
+          <button
+            type="submit"
+            disabled={loading}
+            className="grad-brand h-12 w-full rounded-lg text-sm font-semibold text-white shadow-glow transition hover:shadow-lg disabled:opacity-60"
+          >
+            {loading ? "Création…" : "Continuer"}
+          </button>
+        </form>
+
+        <p className="mt-8 text-center text-sm text-text-soft">
+          Déjà inscrit ?{" "}
+          <Link href="/login" className="font-semibold text-brand-600 hover:underline">
+            Se connecter
+          </Link>
+        </p>
       </div>
-
-      <form onSubmit={onSubmit} className="space-y-4">
-        <div>
-          <label htmlFor="email" className="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-500">
-            Email pro
-          </label>
-          <input
-            id="email"
-            type="email"
-            autoComplete="email"
-            required
-            value={email}
-            onChange={(ev) => setEmail(ev.target.value)}
-            className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium outline-none ring-indigo-400/0 transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-400/30"
-          />
-        </div>
-        <div>
-          <label htmlFor="password" className="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-500">
-            Mot de passe
-          </label>
-          <input
-            id="password"
-            type="password"
-            autoComplete="new-password"
-            required
-            minLength={8}
-            value={password}
-            onChange={(ev) => setPassword(ev.target.value)}
-            className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium outline-none ring-indigo-400/0 transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-400/30"
-          />
-          <p className="mt-1 text-xs text-slate-500">Au moins 8 caractères.</p>
-        </div>
-        {error ? (
-          <p className="rounded-xl bg-red-50 px-3 py-2 text-sm font-medium text-red-700" role="alert">
-            {error}
-          </p>
-        ) : null}
-        {info ? (
-          <p className="rounded-xl bg-indigo-50 px-3 py-2 text-sm font-medium text-indigo-800" role="status">
-            {info}
-          </p>
-        ) : null}
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full rounded-xl bg-gradient-to-br from-blue-600 via-indigo-600 to-violet-700 py-3.5 text-sm font-extrabold text-white shadow-glow-lg transition hover:brightness-110 disabled:opacity-60"
-        >
-          {loading ? "Création…" : "Continuer"}
-        </button>
-      </form>
-
-      <p className="mt-8 text-center text-sm font-medium text-slate-600">
-        Déjà inscrit ?{" "}
-        <Link href="/login" className="font-bold text-indigo-700 no-underline hover:underline">
-          Se connecter
-        </Link>
-      </p>
     </div>
   );
 }

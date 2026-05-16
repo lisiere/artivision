@@ -1,31 +1,24 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
-
-const artiFont = Plus_Jakarta_Sans({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-arti",
-  weight: ["400", "500", "600", "700", "800"],
-});
+import { ThemeProvider } from "@/components/providers/ThemeProvider";
 
 export const metadata: Metadata = {
-  title: {
-    default: "ArtiVision — Photo, projection, devis",
-    template: "%s — ArtiVision",
-  },
+  title: "ArtiVision — Votre chantier en image",
   description:
-    "Projection et chiffrage pour les pros de la rénovation — ce que le client voit, ce que vous chiffrez.",
+    "L'outil de projection visuelle et de chiffrage pour artisans de la rénovation. Photographiez, projetez, chiffrez — en quelques secondes.",
+  metadataBase: new URL("https://artivision.app"),
+  openGraph: {
+    title: "ArtiVision — Votre chantier en image",
+    description: "Projection IA et chiffrage instantané pour artisans.",
+    type: "website",
+  },
 };
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="fr" className={artiFont.variable}>
-      <body className={`${artiFont.className} font-sans min-h-dvh text-slate-900 antialiased`}>
-        {children}
+    <html lang="fr" suppressHydrationWarning>
+      <body>
+        <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
   );
