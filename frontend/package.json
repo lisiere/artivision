@@ -4,6 +4,8 @@
   "private": true,
   "scripts": {
     "clean": "node -e \"const fs=require('fs');['.next','node_modules/.cache'].forEach(p=>{try{fs.rmSync(p,{recursive:true,force:true})}catch(e){}})\"",
+    "hero:images": "node scripts/download-hero-images.mjs",
+    "predev": "node scripts/download-hero-images.mjs",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
