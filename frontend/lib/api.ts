@@ -1,3 +1,5 @@
+import { prepareImagesForUpload } from "@/lib/resizeImage";
+
 const rawBase = process.env.NEXT_PUBLIC_API_URL?.trim() ?? "";
 /** Vide = même origine que le front : Next.js proxifie vers l’API (voir next.config.mjs). */
 const API_BASE = rawBase.replace(/\/$/, "");
@@ -21,6 +23,17 @@ async function ensureOk(res: Response): Promise<void> {
     }
   } catch {
     /* corps non-JSON : on garde le texte brut */
+  }
+  const lower = message.toLowerCase();
+  if (
+    res.status === 413 ||
+    lower.includes("entity too large") ||
+    lower.includes("payload too large") ||
+    lower.includes("body exceeded")
+  ) {
+    throw new Error(
+      "Envoi trop volumineux (plusieurs photos en haute résolution). Réessayez avec moins d’images ou des photos plus légères — elles sont compressées automatiquement à l’envoi.",
+    );
   }
   throw new Error(message || `Erreur HTTP ${res.status}`);
 }
@@ -109,8 +122,9 @@ export async function analyzeImages(files: File[]): Promise<AnalyzeResult> {
   if (!files.length) {
     throw new Error("Ajoutez au moins une photo.");
   }
+  const prepared = await prepareImagesForUpload(files);
   const fd = new FormData();
-  for (const f of files) {
+  for (const f of prepared) {
     fd.append("files", f);
   }
   const res = await postForm("/api/analyze", fd);
