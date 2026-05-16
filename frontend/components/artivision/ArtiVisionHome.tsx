@@ -21,13 +21,12 @@ import {
   Wand2,
   X,
 } from "lucide-react";
-import { analyzeImages, fetchAppContext, fetchQuote } from "@/lib/api";
+import { analyzeImage, fetchAppContext, fetchQuote } from "@/lib/api";
 import { downloadDevisDraft, type DevisStored } from "@/lib/devisExport";
 import { formatEur } from "@/lib/format";
 import { resizeImageToJpegDataUrl } from "@/lib/resizeImage";
 
 const STORAGE_KEY = "renov_chantier_result_v1";
-const MAX_PHOTOS_PER_ROOM = 8;
 const MAX_ROOMS = 6;
 
 const FALLBACK_TIERS: { id: string; label: string; hint: string }[] = [
@@ -358,21 +357,23 @@ export function ArtiVisionHome() {
     });
   }, []);
 
-  const appendPhotosToActive = useCallback(
+  const setPhotoForActive = useCallback(
     (fileList: FileList | File[] | null) => {
       if (!fileList || !fileList.length) return;
       setError(null);
-      const incoming = Array.from(fileList as File[]);
+      const file = Array.from(fileList as File[]).find((f) => f.type.startsWith("image/"));
+      if (!file) return;
       setRooms((prev) =>
         prev.map((r) => {
           if (r.id !== activeId) return r;
-          const next = [...r.photos];
-          for (const f of incoming) {
-            if (!f.type.startsWith("image/")) continue;
-            if (next.length >= MAX_PHOTOS_PER_ROOM) break;
-            next.push({ id: newId(), file: f, previewUrl: URL.createObjectURL(f) });
-          }
-          return { ...r, photos: next, materials: [], analysisCompleted: false, projectionTier: null };
+          r.photos.forEach((p) => URL.revokeObjectURL(p.previewUrl));
+          return {
+            ...r,
+            photos: [{ id: newId(), file, previewUrl: URL.createObjectURL(file) }],
+            materials: [],
+            analysisCompleted: false,
+            projectionTier: null,
+          };
         }),
       );
     },
@@ -398,25 +399,25 @@ export function ArtiVisionHome() {
 
   const onFileInput = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      appendPhotosToActive(e.target.files);
+      setPhotoForActive(e.target.files);
       e.target.value = "";
     },
-    [appendPhotosToActive],
+    [setPhotoForActive],
   );
 
   const onDrop = useCallback(
     (e: React.DragEvent) => {
       e.preventDefault();
       setDragActive(false);
-      appendPhotosToActive(e.dataTransfer.files);
+      setPhotoForActive(e.dataTransfer.files);
     },
-    [appendPhotosToActive],
+    [setPhotoForActive],
   );
 
   const onChiffrerProjeter = useCallback(async () => {
-    const files = activeRoom.photos.map((p) => p.file);
-    if (!files.length) {
-      setError("Ajoutez au moins une photo.");
+    const photo = activeRoom.photos[0];
+    if (!photo) {
+      setError("Ajoutez une photo.");
       return;
     }
     if (!(activeRoom.areaM2 > 0)) {
@@ -435,7 +436,7 @@ export function ArtiVisionHome() {
     setPipelinePhase(1);
     const phase1Start = Date.now();
     try {
-      const res = await analyzeImages(files);
+      const res = await analyzeImage(photo.file);
       const mats = res.materials.map(String);
       let roomType: RoomValue = activeRoom.roomType;
       if (res.confidence >= 0.35 && ROOM_OPTIONS.some((r) => r.value === res.suggested_room_type)) {
@@ -450,7 +451,7 @@ export function ArtiVisionHome() {
       await new Promise((r) => setTimeout(r, Math.max(0, 2600 - elapsed)));
       setPipelinePhase(2);
 
-      const imageDataUrl = await resizeImageToJpegDataUrl(files[0]);
+      const imageDataUrl = await resizeImageToJpegDataUrl(photo.file);
       const repRoom = replicateRoomTypeFromRoomValue(roomType);
       const analysisPayload: GenerateAnalysisPayload = {
         suggested_room_type: roomType,
@@ -657,14 +658,13 @@ export function ArtiVisionHome() {
         className="sr-only"
         type="file"
         accept="image/*"
-        multiple
         onChange={onFileInput}
         tabIndex={-1}
       />
 
       {/* Zone photo prioritaire : sans clichés, le reste de l’app est secondaire */}
       {!activeRoom.photos.length ? (
-        <section className="relative mb-6 lg:mb-10" aria-label="Importer des photos">
+        <section className="relative mb-6 lg:mb-10" aria-label="Importer une photo">
           <div
             role="button"
             tabIndex={0}
@@ -694,7 +694,7 @@ export function ArtiVisionHome() {
           >
             <Camera className="mx-auto h-14 w-14 text-indigo-600 sm:h-16 sm:w-16" strokeWidth={1.35} aria-hidden />
             <p className="mt-5 text-balance text-2xl font-black tracking-tight text-slate-900 sm:text-3xl lg:text-4xl">
-              Par ici, vos photos
+              Par ici, votre photo
             </p>
             <p className="mx-auto mt-2 max-w-md text-sm font-medium text-slate-600 sm:text-base">
               C’est la première étape : on s’occupe du reste après.
@@ -708,10 +708,10 @@ export function ArtiVisionHome() {
               className="mt-8 inline-flex min-h-[3.25rem] items-center justify-center gap-2 rounded-2xl bg-gradient-to-br from-blue-600 via-indigo-600 to-violet-700 px-10 text-base font-extrabold text-white shadow-glow-lg transition hover:brightness-110 sm:min-h-[3.5rem] sm:px-12 sm:text-lg"
             >
               <ImagePlus className="h-5 w-5 shrink-0" strokeWidth={2.2} aria-hidden />
-              Choisir des photos
+              Choisir une photo
             </button>
             <p className="mt-4 text-xs font-semibold text-slate-500 sm:text-sm">
-              Glisser-déposer ici · jusqu’à {MAX_PHOTOS_PER_ROOM} images · JPEG, PNG ou WebP
+              Glisser-déposer ici · JPEG, PNG ou WebP
             </p>
           </div>
         </section>
@@ -751,8 +751,8 @@ export function ArtiVisionHome() {
                 >
                   Pièce {idx + 1}
                   <span className="mt-0.5 block text-[11px] font-semibold text-slate-500">
-                    {ROOM_OPTIONS.find((o) => o.value === r.roomType)?.label ?? r.roomType} · {r.photos.length} photo
-                    {r.photos.length !== 1 ? "s" : ""}
+                    {ROOM_OPTIONS.find((o) => o.value === r.roomType)?.label ?? r.roomType}
+                    {r.photos.length ? " · photo OK" : " · sans photo"}
                   </span>
                 </button>
                 {rooms.length > 1 ? (
@@ -773,83 +773,37 @@ export function ArtiVisionHome() {
 
       <div className="grid gap-6 lg:grid-cols-12 lg:gap-8 lg:items-start">
         <div className="space-y-5 lg:col-span-7">
-      {/* Photos de la pièce active (aperçus + ajout) */}
+      {/* Photo de la pièce active */}
       {activeRoom.photos.length > 0 ? (
       <section className="relative mb-5 overflow-hidden rounded-3xl border border-slate-200/90 bg-white p-4 shadow-card sm:p-5">
         <div className="mb-3 flex items-start justify-between gap-3">
           <div>
-            <h2 className="text-sm font-extrabold text-slate-900">Vos clichés — pièce {roomIndex}</h2>
-            <p className="mt-0.5 text-xs text-slate-500">Plusieurs angles affinent le rendu ({MAX_PHOTOS_PER_ROOM} max).</p>
+            <h2 className="text-sm font-extrabold text-slate-900">Votre photo — pièce {roomIndex}</h2>
           </div>
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="inline-flex shrink-0 items-center gap-1.5 rounded-xl bg-slate-900 px-3 py-2 text-xs font-bold text-white shadow-md transition hover:bg-slate-800"
+            className="inline-flex shrink-0 items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-800 shadow-sm transition hover:bg-slate-50"
           >
-            <ImagePlus className="h-4 w-4" strokeWidth={2.2} aria-hidden />
-            Ajouter
+            <RefreshCw className="h-4 w-4" strokeWidth={2.2} aria-hidden />
+            Remplacer
           </button>
         </div>
 
-        {activeRoom.photos.length === 1 ? (
-          <div
-            className="mb-3 rounded-2xl border border-amber-200/90 bg-amber-50/80 px-3 py-2.5 text-[11px] font-medium leading-snug text-amber-950 sm:text-xs"
-            role="status"
-          >
-            Pour une meilleure cohérence avec la pièce réelle, ajoutez{" "}
-            <span className="font-bold">2 à 3 photos</span> (angles différents) si vous le pouvez — la génération utilise
-            surtout la première image.
+        {activeRoom.photos[0] ? (
+          <div className="group relative aspect-[4/3] overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 sm:aspect-[16/10]">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={activeRoom.photos[0].previewUrl} alt="" className="h-full w-full object-cover" />
+            <button
+              type="button"
+              aria-label="Retirer cette photo"
+              onClick={() => removePhoto(activeRoom.photos[0].id)}
+              className="absolute right-2 top-2 rounded-lg bg-black/55 p-1.5 text-white transition hover:bg-black/70"
+            >
+              <X className="h-4 w-4" strokeWidth={2.5} />
+            </button>
           </div>
         ) : null}
-
-        <div
-          role="button"
-          tabIndex={0}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-              e.preventDefault();
-              fileInputRef.current?.click();
-            }
-          }}
-          onDragEnter={(e) => {
-            e.preventDefault();
-            setDragActive(true);
-          }}
-          onDragOver={(e) => {
-            e.preventDefault();
-            setDragActive(true);
-          }}
-          onDragLeave={() => setDragActive(false)}
-          onDrop={onDrop}
-          onClick={() => fileInputRef.current?.click()}
-          className={[
-            "cursor-pointer rounded-2xl border-2 border-dashed px-3 py-6 text-center transition sm:py-7",
-            dragActive ? "border-indigo-400 bg-indigo-50/80" : "border-slate-200 bg-slate-50/50 hover:border-indigo-300",
-          ].join(" ")}
-        >
-          <p className="text-sm font-semibold text-slate-700">Glisser-déposer pour en ajouter</p>
-          <p className="mt-1 text-xs text-slate-500">ou toucher cette zone</p>
-        </div>
-
-          <ul className="mt-4 grid grid-cols-3 gap-2 sm:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5">
-            {activeRoom.photos.map((p) => (
-              <li key={p.id} className="group relative aspect-square overflow-hidden rounded-xl border border-slate-200 bg-slate-100">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={p.previewUrl} alt="" className="h-full w-full object-cover" />
-                <button
-                  type="button"
-                  aria-label="Retirer cette photo"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    removePhoto(p.id);
-                  }}
-                  className="absolute right-1 top-1 rounded-lg bg-black/55 p-1 text-white opacity-0 transition group-hover:opacity-100 sm:opacity-100"
-                >
-                  <X className="h-3.5 w-3.5" strokeWidth={2.5} />
-                </button>
-              </li>
-            ))}
-          </ul>
       </section>
       ) : null}
 
